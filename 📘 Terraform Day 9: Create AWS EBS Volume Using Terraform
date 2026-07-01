@@ -1,0 +1,182 @@
+🧭 Project Overview
+
+In this project, we use Terraform to provision an Amazon Elastic Block Store (EBS) volume, which provides persistent block-level storage for EC2 instances.
+
+Unlike instance storage (which is temporary), EBS volumes retain data even when the EC2 instance is stopped or terminated, making them essential for stateful applications.
+
+🎯 Objective
+Create an EBS volume using Terraform
+Understand persistent block storage in AWS
+Learn how storage is decoupled from compute
+Understand how EBS supports production workloads
+
+🧰 Technologies Used
+Technology	Purpose
+Terraform	Infrastructure as Code
+AWS EBS	Persistent block storage
+AWS EC2	Compute (optional attachment target)
+AWS	Cloud platform
+
+📌 Concept Explanation
+
+An EBS (Elastic Block Store) volume is a virtual hard disk that you can attach to EC2 instances.
+
+Key characteristics:
+Persistent storage (data survives reboot)
+Highly available within an Availability Zone
+Can be attached/detached from EC2 instances
+Supports snapshots for backup and recovery
+Storage Architecture Overview
+         AWS Cloud
+
+     ┌───────────────┐
+     │   EC2 Instance │
+     └──────┬────────┘
+            │
+            ▼
+     ┌───────────────┐
+     │  EBS Volume    │
+     │  (Persistent)  │
+     └───────────────┘
+
+The EC2 instance acts as compute, while the EBS volume provides persistent storage.
+
+Why EBS Matters in DevOps
+
+Without EBS:
+
+Data is lost when an instance stops
+Applications cannot maintain state
+Databases cannot function reliably
+
+With EBS:
+
+Data persists independently of compute
+Storage can be resized and managed dynamically
+Backups can be created using snapshots
+Infrastructure becomes more resilient
+🛠️ Project Files
+terraform-ebs/
+├── main.tf
+├── variables.tf
+├── outputs.tf
+└── README.md
+
+Implementation
+Step 1: Configure AWS Provider
+provider "aws" {
+  region = "us-east-1"
+}
+Step 2: Create EBS Volume
+resource "aws_ebs_volume" "devops_volume" {
+  availability_zone = "us-east-1a"
+  size              = 10
+  type              = "gp2"
+
+  tags = {
+    Name = "devops-ebs-volume"
+  }
+}
+Explanation
+availability_zone
+availability_zone = "us-east-1a"
+
+EBS volumes are AZ-specific, meaning they must be created in the same availability zone as the EC2 instance they will attach to.
+
+size
+size = 10
+
+Defines the storage capacity in GB.
+
+type
+type = "gp2"
+
+Specifies the volume type:
+
+Type	Description
+gp2	General Purpose SSD
+gp3	Newer SSD (recommended)
+io1/io2	High-performance workloads
+sc1	Cold HDD
+st1	Throughput optimized HDD
+Step 3: Initialize Terraform
+terraform init
+Step 4: Validate Configuration
+terraform validate
+Step 5: Preview Changes
+terraform plan
+Step 6: Apply Configuration
+terraform apply
+
+Confirm:
+
+yes
+Step 7: Verify Deployment
+terraform state list
+
+Expected output:
+
+aws_ebs_volume.devops_volume
+
+You can also verify in AWS Console:
+
+EC2 → Elastic Block Store → Volumes
+
+🔐 Security Best Practices
+Encrypt EBS volumes for sensitive workloads
+Delete unused volumes to avoid unnecessary costs
+Ensure correct attachment permissions via IAM roles
+Use snapshots for backup and recovery strategies
+Restrict volume access within the correct VPC and AZ boundaries
+💰 Cost Awareness
+
+You are billed for:
+
+Provisioned storage (GB per month)
+Provisioned IOPS (for performance types)
+Snapshots stored in S3
+
+Always delete unused volumes and snapshots to avoid unnecessary charges.
+
+🏗️ Real-World Use Cases
+Scenario	Description
+Databases	MySQL, PostgreSQL, and persistent storage
+File Systems	Shared application storage
+Logging Systems: Persistent log retention
+Kubernetes Nodes: Persistent volumes for pods
+Enterprise Apps: Stateful backend systems
+
+⚠️ Common Mistakes
+❌ Creating volume in the wrong availability zone
+❌ Forgetting to attach a volume to the EC2 instance
+❌ Not deleting unused volumes (cost leak)
+❌ Using the wrong volume type for workload
+❌ Storing sensitive data without encryption
+
+📚 Key Takeaways
+EBS provides persistent storage for EC2 instances.
+Storage is independent of the compute lifecycle.
+Volumes are AZ-specific and must match the instance location.
+Terraform allows full lifecycle management of storage resources.
+EBS is essential for stateful applications like databases.
+
+🚀 Summary
+In this project, we provisioned an AWS EBS volume using Terraform, introducing persistent block storage in AWS. This demonstrated how cloud infrastructure separates compute and storage, enabling scalable and resilient application architectures.
+
+💡 Senior DevOps Insight
+At this stage, you are starting to see the real architecture of cloud systems:
+
+EC2 = Compute
+EBS = Storage
+VPC = Network
+
+In production systems, these are never treated independently. Instead, they form a cohesive infrastructure layer.
+
+Experienced engineers think in terms of:
+
+"What happens to my data if the instance fails?"
+
+EBS solves that problem — but more importantly, it introduces the mindset of decoupling infrastructure components for resilience, scalability, and fault tolerance.
+"What happens to my data if the instance fails?"
+
+EBS solves that problem — but more importantly, it introduces the mindset of decoupling infrastructure components for resilience, scalability, and fault tolerance.
