@@ -1,0 +1,199 @@
+🧭 Project Overview
+
+In this project, we use Terraform to provision an Amazon EC2 (Elastic Compute Cloud) instance, which represents a virtual server in AWS. This is a foundational DevOps skill because EC2 instances are used to run applications, services, and backend systems in the cloud.
+
+Instead of manually launching servers from the AWS Console, we define and deploy infrastructure using Infrastructure as Code (IaC).
+
+🎯 Objective
+Launch an EC2 instance using Terraform
+Attach key pair for SSH access
+Associate security groups for network control
+Understand cloud compute provisioning
+Learn how compute resources are managed as code
+
+🧰 Technologies Used
+Technology	Purpose
+Terraform	Infrastructure as Code
+AWS EC2	Virtual server (compute instance)
+AWS Security Groups	Network firewall
+AWS Key Pair	SSH authentication
+AWS	Cloud provider
+
+📌 Concept Explanation
+
+An EC2 instance is a virtual machine in AWS that allows you to run applications in the cloud.
+
+It consists of:
+
+Operating system (AMI)
+CPU and memory configuration (instance type)
+Network configuration (VPC + Security Group)
+Authentication (Key Pair)
+EC2 Architecture Overview
+              AWS Cloud
+
+     ┌─────────────────────────┐
+     │      EC2 Instance       │
+     │                         │
+     │  OS: Amazon Linux       │
+     │  App: Web Server        │
+     └─────────┬───────────────┘
+               │
+     ┌─────────▼───────────────┐
+     │ Security Group (Firewall)│
+     │ SSH (22), HTTP (80)     │
+     └─────────┬───────────────┘
+               │
+     ┌─────────▼───────────────┐
+     │ Key Pair Authentication  │
+     └─────────────────────────┘
+
+🛠️ Project Files
+terraform-ec2/
+├── main.tf
+├── variables.tf
+├── outputs.tf
+└── README.md
+
+Implementation
+Step 1: Configure AWS Provider
+provider "aws" {
+  region = "us-east-1"
+}
+Step 2: Reference Existing Key Pair (from Day 1)
+resource "aws_key_pair" "devops_kp" {
+  key_name   = "devops-kp"
+  public_key = file("~/.ssh/id_rsa.pub")
+}
+Step 3: Create Security Group (from Day 2)
+resource "aws_security_group" "ec2_sg" {
+  name        = "ec2-security-group"
+  description = "Allow SSH and HTTP traffic"
+
+  ingress {
+    description = "SSH Access"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "HTTP Access"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+Step 4: Launch EC2 Instance
+resource "aws_instance" "web_server" {
+  ami           = "ami-0c101f26f147fa7fd"
+  instance_type = "t2.micro"
+
+  key_name = aws_key_pair.devops_kp.key_name
+
+  vpc_security_group_ids = [
+    aws_security_group.ec2_sg.id
+  ]
+
+  tags = {
+    Name = "devops-ec2"
+  }
+}
+Explanation
+ami
+ami = "ami-0c101f26f147fa7fd"
+
+Defines the operating system image used to launch the instance.
+
+instance_type
+instance_type = "t2.micro"
+
+Specifies compute resources (CPU + memory).
+
+key_name
+key_name = aws_key_pair.devops_kp.key_name
+
+Attaches SSH key for secure login.
+
+vpc_security_group_ids
+vpc_security_group_ids = [aws_security_group.ec2_sg.id]
+
+Attaches firewall rules to the instance.
+
+Step 5: Initialize Terraform
+terraform init
+Step 6: Validate Configuration
+terraform validate
+Step 7: Preview Infrastructure
+terraform plan
+Step 8: Deploy EC2 Instance
+terraform apply
+
+Confirm:
+
+yes
+Step 9: Verify Deployment
+terraform state list
+
+Expected output:
+
+aws_instance.web_server
+aws_key_pair.devops_kp
+aws_security_group.ec2_sg
+Optional: Connect to EC2 Instance
+ssh -i ~/.ssh/id_rsa ec2-user@<public-ip>
+🔐 Security Best Practices
+Never expose SSH (port 22) to all IPs in production.
+Use restricted IP ranges or VPN access.
+Avoid hardcoding AMI IDs across regions.
+Use least privilege security groups.
+Tag resources properly for tracking and cost management.
+Do not reuse the same key pair across environments.
+🏗️ Real-World Use Cases
+Scenario	Description
+Web Hosting	Deploy websites and APIs
+Backend Services	Run application logic
+CI/CD Agents	Jenkins or GitHub runners
+Development Servers	Shared dev environments
+Microservices	Container host machines
+⚠️ Common Mistakes
+❌ Wrong AMI for region
+❌ Missing key pair (cannot SSH into instance)
+❌ Overly permissive security groups
+❌ Forgetting dependency order between resources
+❌ Not tagging EC2 instances
+📚 Key Takeaways
+EC2 is the core compute service in AWS.
+Terraform allows full lifecycle management of servers.
+EC2 requires key pairs, security groups, and AMIs.
+Infrastructure is now becoming fully functional (network + compute + access).
+This is a major milestone in your Terraform journey.
+🚀 Summary
+
+In this project, we provisioned an AWS EC2 instance using Terraform, connected it to a security group, and configured SSH access using a key pair. This marks a major transition from networking infrastructure into real compute workloads, which is the foundation of most cloud applications.
+
+💡 Senior DevOps Insight
+
+At this stage, you're no longer just creating infrastructure components—you are assembling a real cloud system.
+
+A single EC2 instance may look simple, but in production it represents:
+
+Application servers
+API backends
+CI/CD runners
+Microservices nodes
+
+Experienced DevOps engineers think beyond “launching a server” and instead ask:
+
+"How does this server fit into a scalable, secure, and automated architecture?"
+
+From this point forward, everything you build should be viewed as part of a larger system design, not isolated resources.
