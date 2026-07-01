@@ -1,0 +1,184 @@
+🧭 Project Overview
+
+In this project, we use Terraform to provision an AWS EC2 Key Pair using Infrastructure as Code (IaC). Instead of manually creating a key pair through the AWS Management Console, 
+Terraform allows us to define the resource declaratively and deploy it consistently across environments.
+
+This introduces one of the core DevOps principles: automating infrastructure provisioning.
+
+🎯 Objective
+Create an AWS EC2 Key Pair using Terraform
+Store the public key in AWS
+Understand the role of SSH key pairs in cloud environments
+Learn how Terraform manages cloud resources declaratively
+
+🧰 Technologies Used
+Technology	Purpose
+Terraform	Infrastructure as Code (IaC)
+AWS EC2	Compute service
+SSH	Secure remote server access
+AWS Key Pair	Authentication for EC2 instances
+
+📌 Concept Explanation
+
+A Key Pair in AWS consists of:
+
+Public Key → Stored securely in AWS
+Private Key → Stored locally by the administrator
+
+When an EC2 instance is launched, AWS injects the public key into the instance. The administrator then uses the corresponding private key to authenticate securely via SSH.
+
+            AWS
+      ┌──────────────┐
+      │ Public Key   │
+      └──────┬───────┘
+             │
+      Launch EC2 Instance
+             │
+             ▼
+      ┌──────────────┐
+      │ EC2 Instance │
+      └──────┬───────┘
+             ▲
+             │ SSH Authentication
+             │
+      ┌──────────────┐
+      │ Private Key  │
+      │ (Local PC)   │
+      └──────────────┘
+Why Key Pairs Matter
+
+Unlike traditional servers that use usernames and passwords, cloud environments rely heavily on SSH key-based authentication because it provides:
+
+Stronger security than passwords
+Protection against brute-force attacks
+Secure automation for DevOps workflows
+Authentication without transmitting passwords over the network
+
+This is why AWS requires a key pair when launching most Linux EC2 instances.
+
+🛠️ Project Files
+terraform-keypair/
+├── main.tf
+├── variables.tf
+├── outputs.tf
+└── README.md
+
+Implementation
+Step 1: Define the AWS Provider
+provider "aws" {
+  region = "us-east-1"
+}
+
+This tells Terraform which cloud provider to interact with and the AWS region where resources will be created.
+
+Step 2: Create the Key Pair Resource
+resource "aws_key_pair" "devops_kp" {
+  key_name   = "devops-kp"
+  public_key = file("~/.ssh/id_rsa.pub")
+}
+Explanation
+aws_key_pair → Terraform resource for AWS EC2 key pairs
+key_name → Name displayed in the AWS Console
+public_key → Reads the local public key file and uploads it to AWS
+
+Note: Terraform uploads only the public key. Your private key remains on your local machine and should never be committed to version control.
+
+Step 3: Initialize Terraform
+terraform init
+
+This downloads the AWS provider plugin and initializes the working directory.
+
+Step 4: Validate Configuration
+terraform validate
+
+This checks the configuration for syntax errors before deployment.
+
+Step 5: Preview Infrastructure
+terraform plan
+
+This generates an execution plan showing what Terraform intends to create without making changes.
+
+Step 6: Deploy Infrastructure
+terraform apply
+
+Type:
+
+yes
+
+Terraform creates the AWS Key Pair.
+
+Step 7: Verify Deployment
+
+Confirm the resource exists:
+
+terraform state list
+
+Expected output:
+
+aws_key_pair.devops_kp
+
+You can also verify the key pair in the AWS Management Console under:
+
+EC2 → Network & Security → Key Pairs
+
+📂 Terraform Resource Lifecycle
+
+One of the key concepts introduced in this project is Terraform's resource lifecycle:
+
+Write Configuration
+        │
+        ▼
+terraform init
+        │
+        ▼
+terraform validate
+        │
+        ▼
+terraform plan
+        │
+        ▼
+terraform apply
+        │
+        ▼
+Infrastructure Created
+
+This workflow is followed for nearly every Terraform deployment.
+
+🔐 Security Best Practices
+Never commit private keys (id_rsa) to Git repositories.
+Store private keys securely with appropriate file permissions (chmod 600).
+Use descriptive key names for different environments (e.g., dev, staging, prod).
+Rotate SSH keys periodically.
+Prefer IAM roles or cloud-native identity mechanisms over SSH where possible.
+
+🏗️ Real-World Use Cases
+Scenario	Description
+EC2 Administration: Secure SSH access to Linux instances
+CI/CD Pipelines	Automated infrastructure provisioning
+Infrastructure Automation: Consistent key management across environments
+Disaster Recovery: Recreate infrastructure from code
+Multi-Environment Deployments	Standardized access for development, staging, and production
+
+⚠️ Common Mistakes
+❌ Uploading the private key instead of the public key
+❌ Committing SSH keys to GitHub
+❌ Using an incorrect file path with the file() function
+❌ Forgetting to initialize Terraform before planning
+❌ Hardcoding environment-specific values instead of using variables
+
+📚 Key Takeaways
+Terraform provisions cloud infrastructure declaratively.
+AWS Key Pairs enable secure SSH authentication to EC2 instances.
+Only the public key is stored in AWS.
+The standard Terraform workflow is:
+terraform init
+terraform validate
+terraform plan
+terraform apply
+Key pairs are foundational for securely managing cloud servers.
+
+🚀 Summary
+
+In this project, we provisioned an AWS EC2 Key Pair using Terraform, replacing manual console-based configuration with Infrastructure as Code. 
+This exercise introduced the Terraform workflow, demonstrated secure SSH authentication principles, and established a foundation for future AWS infrastructure projects, such as launching EC2 instances, 
+configuring networking, and automating cloud deployments.
