@@ -1,0 +1,176 @@
+🧭 Project Overview
+
+In this project, we use Terraform to provision an AWS Elastic IP (EIP), which is a static public IPv4 address that can be attached to cloud resources such as EC2 instances.
+
+Unlike normal public IPs, Elastic IPs remain persistent even if the instance is stopped or restarted, making them essential for stable public-facing applications.
+
+🎯 Objective
+Create an Elastic IP using Terraform
+Understand static vs dynamic public IP addressing
+Learn how AWS manages public connectivity
+Understand use cases for fixed IP assignment in cloud infrastructure
+
+🧰 Technologies Used
+Technology	Purpose
+Terraform	Infrastructure as Code (IaC)
+AWS EC2	Compute service
+AWS Elastic IP	Static public IPv4 address
+AWS	Cloud platform
+
+📌 Concept Explanation
+
+An Elastic IP (EIP) is a static IPv4 address provided by AWS that can be associated with:
+
+EC2 instances
+Network interfaces
+NAT Gateways
+Key characteristics:
+Persistent (does not change when instance restarts)
+Manually allocated and released
+Can be reassigned to different resources
+Elastic IP vs Normal Public IP
+Feature	Public IP	Elastic IP
+Persistence	Temporary	Persistent
+Change on restart	Yes	No
+Reassignment	No	Yes
+Use case	Short-lived instances	Production workloads
+🛠️ Architecture Overview
+        AWS Cloud
+
+     ┌───────────────┐
+     │ Elastic IP    │
+     │ 3.120.x.x     │
+     └──────┬────────┘
+            │
+            ▼
+     ┌───────────────┐
+     │ EC2 Instance   │
+     │ Web Server     │
+     └───────────────┘
+
+The Elastic IP ensures the EC2 instance always has a stable public endpoint.
+
+🛠️ Project Files
+terraform-eip/
+├── main.tf
+├── variables.tf
+├── outputs.tf
+└── README.md
+
+Implementation
+Step 1: Configure AWS Provider
+provider "aws" {
+  region = "us-east-1"
+}
+Step 2: Create Elastic IP
+resource "aws_eip" "devops_eip" {
+  domain = "vpc"
+
+  tags = {
+    Name = "devops-eip"
+  }
+}
+Explanation
+domain = "vpc"
+domain = "vpc"
+
+Specifies that the Elastic IP is allocated for use within a VPC environment (modern AWS standard).
+
+Tags
+tags = {
+  Name = "devops-eip"
+}
+
+Used for identification, automation, and cost tracking.
+
+Step 3: Initialize Terraform
+terraform init
+
+Downloads required provider plugins.
+
+Step 4: Validate Configuration
+terraform validate
+
+Ensures the configuration is syntactically correct.
+
+Step 5: Preview Infrastructure
+terraform plan
+
+Shows what Terraform will create before applying changes.
+
+Step 6: Apply Configuration
+terraform apply
+
+Confirm:
+
+yes
+
+Terraform allocates a static public IP from AWS.
+
+Step 7: Verify Deployment
+terraform state list
+
+Expected output:
+
+aws_eip.devops_eip
+
+You can also verify in AWS Console:
+
+EC2 → Elastic IPs
+
+🔐 Security Best Practices
+Release unused Elastic IPs to avoid unnecessary costs.
+Avoid exposing unnecessary services to the public internet.
+Associate EIPs only with properly secured instances.
+Use Security Groups to restrict access even when EIP is assigned.
+Track and document all public IP usage for governance.
+
+💰 Cost Awareness (Important)
+
+AWS charges for Elastic IPs when:
+
+They are allocated but not attached to a running instance
+You exceed free-tier limits
+
+Always release unused Elastic IPs in non-production environments.
+
+🏗️ Real-World Use Cases
+
+Scenario	Description
+Web Servers	Stable public endpoint for websites
+Bastion Hosts	Secure SSH gateway to private networks
+APIs	Fixed IP for external integrations
+Legacy Systems	IP whitelisting requirements
+DNS Mapping	Static IP linked to domain names
+
+⚠️ Common Mistakes
+❌ Leaving unused Elastic IPs allocated (cost leakage)
+❌ Assuming EIP replaces Security Groups (it does not)
+❌ Attaching EIP to incorrect instance
+❌ Not documenting public IP usage
+❌ Exposing instances publicly without firewall rules
+
+📚 Key Takeaways
+Elastic IPs provide static public IP addresses in AWS.
+They are essential for stable public-facing services.
+Terraform allows Elastic IPs to be managed as code.
+EIPs must be carefully managed to avoid unnecessary costs.
+Security Groups are still required even when using EIPs.
+
+🚀 Summary
+In this project, we provisioned an AWS Elastic IP using Terraform, enabling a static and persistent public IP address for cloud resources. This introduced the concept of stable internet-facing infrastructure and reinforced the importance of controlled public exposure in cloud environments.
+
+💡 Senior DevOps Insight
+One key difference between beginners and experienced cloud engineers is how they handle public exposure.
+
+Beginners often think:
+
+"I need a public IP so my server can be accessed."
+
+Experienced engineers think:
+
+"If this resource must be public, how do I minimize exposure, control traffic, and ensure I can rotate or migrate it without downtime?"
+
+Elastic IPs are powerful, but in modern cloud architecture, they are used sparingly and deliberately—often replaced with load balancers, DNS routing, and auto-scaling architectures.
+
+Understanding when NOT to use an Elastic IP is just as important as knowing how to create one.
