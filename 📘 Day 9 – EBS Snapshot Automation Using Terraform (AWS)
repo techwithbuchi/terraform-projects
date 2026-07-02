@@ -1,0 +1,118 @@
+🧠 Project Overview
+
+In this project, we implemented Infrastructure as Code (IaC) using Terraform to automate the creation of an AWS EBS snapshot from an existing volume.
+
+This simulates a real-world DevOps use case where organizations need automated backups and disaster recovery mechanisms for critical storage systems.
+
+Instead of manually creating snapshots via AWS Console, we defined the entire process using Terraform for repeatability, consistency, and scalability.
+
+🎯 Objectives
+Create an EBS volume using Terraform
+Generate a snapshot from the volume
+Ensure proper tagging and documentation of resources
+Validate snapshot completion in AWS
+🏗️ Architecture Overview
+Terraform
+   │
+   ▼
+AWS Provider (us-east-1)
+   │
+   ├── EBS Volume (devops-vol)
+   │
+   └── EBS Snapshot (devops-vol-ss)
+⚙️ Technologies Used
+Terraform
+AWS (EC2 / EBS)
+AWS CLI (for verification)
+Linux CLI
+📁 Project Structure
+/home/bob/terraform
+│
+├── main.tf
+└── (Terraform state files generated after apply)
+🧾 Terraform Configuration
+🔹 EBS Volume Creation
+resource "aws_ebs_volume" "k8s_volume" {
+  availability_zone = "us-east-1a"
+  size              = 5
+  type              = "gp2"
+
+  tags = {
+    Name = "devops-vol"
+  }
+}
+🔹 EBS Snapshot Creation
+resource "aws_ebs_snapshot" "devops_snapshot" {
+  volume_id   = aws_ebs_volume.k8s_volume.id
+  description = "Devops Snapshot"
+
+  tags = {
+    Name = "devops-vol-ss"
+  }
+}
+🔗 Key Concepts Applied
+1. Infrastructure as Code (IaC)
+
+All infrastructure is defined in code using Terraform, making it:
+
+Repeatable
+Version-controlled
+Easy to maintain
+2. Dependency Management
+
+Terraform automatically understands resource dependencies:
+
+EBS Volume → Snapshot
+
+No manual ordering required.
+
+3. Tagging Strategy
+
+Tags were used for resource identification:
+
+Name: devops-vol
+Snapshot Name: devops-vol-ss
+
+This improves:
+
+Cost tracking
+Resource identification
+Governance
+🚀 Deployment Steps
+1. Initialize Terraform
+terraform init
+2. Validate configuration
+terraform validate
+3. Apply infrastructure
+terraform apply -auto-approve
+🔍 Verification Steps
+
+Check snapshot status using AWS CLI:
+
+aws ec2 describe-snapshots \
+--owner-ids self \
+--region us-east-1
+
+Ensure:
+
+Snapshot name: devops-vol-ss
+Description: Devops Snapshot
+State: completed
+📌 Outcome
+Successfully created an EBS volume using Terraform
+Automated snapshot creation process
+Verified snapshot completion in AWS
+Demonstrated Infrastructure as Code principles
+💡 Real-World Use Case
+
+In production environments, this approach is used for:
+
+Automated database backups
+Disaster recovery strategies
+Pre-deployment system snapshots
+Compliance and auditing requirements
+📈 Key Takeaways
+Terraform simplifies AWS infrastructure automation
+Snapshots are essential for data durability and recovery
+Resource dependencies are automatically managed
+Tagging is critical for real-world cloud governance
