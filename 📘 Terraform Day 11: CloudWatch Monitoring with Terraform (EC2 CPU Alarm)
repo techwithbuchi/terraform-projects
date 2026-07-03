@@ -1,0 +1,134 @@
+🧠 Project Overview
+
+In this project, we implemented monitoring and alerting using AWS CloudWatch and Terraform.
+
+The goal was to create an automated alarm that monitors CPU utilization of an EC2 instance and triggers when usage exceeds a defined threshold.
+
+This simulates a real-world DevOps monitoring setup where teams detect performance issues before they impact users.
+
+🎯 Objective
+
+Using Terraform, we:
+
+Created a CloudWatch alarm named datacenter-alarm
+Monitored EC2 CPU utilization
+Triggered alarm when CPU > 80%
+Set evaluation period to 5 minutes (300 seconds)
+Used a single evaluation period
+Fully automated infrastructure using IaC
+🏗️ Architecture Overview
+EC2 Instance
+     │
+     ▼
+CloudWatch Metrics (CPUUtilization)
+     │
+     ▼
+CloudWatch Alarm
+     │
+     ▼
+Alarm State = ALARM (CPU > 80%)
+⚙️ Technologies Used
+Terraform (Infrastructure as Code)
+AWS CloudWatch
+AWS EC2 Metrics
+AWS Provider (us-east-1)
+📁 Project Structure
+/home/bob/terraform
+│
+├── main.tf
+└── terraform.tfstate (generated after apply)
+🧾 Terraform Configuration
+🔹 CloudWatch CPU Alarm
+provider "aws" {
+  region = "us-east-1"
+}
+
+resource "aws_cloudwatch_metric_alarm" "cpu_alarm" {
+  alarm_name          = "datacenter-alarm"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = 300
+  statistic           = "Average"
+  threshold           = 80
+
+  dimensions = {
+    InstanceId = "i-1234567890abcdef0"
+  }
+}
+🔍 Key Concepts Applied
+1. Infrastructure as Code (IaC)
+
+We defined monitoring infrastructure using Terraform, making it:
+
+Repeatable
+Version-controlled
+Automatable
+2. Cloud Monitoring with CloudWatch
+
+CloudWatch continuously collects metrics such as:
+
+CPU utilization
+Network activity
+Disk I/O
+
+We configured an alarm based on CPU usage thresholds.
+
+3. Threshold-Based Alerting
+
+Alarm logic:
+
+IF CPUUtilization > 80%
+FOR 5 minutes
+THEN trigger ALARM state
+4. Time-Based Evaluation
+Period: 300 seconds (5 minutes)
+Evaluation periods: 1
+
+This means a single breach triggers the alarm.
+
+🚀 Deployment Steps
+1. Initialize Terraform
+terraform init
+2. Validate configuration
+terraform validate
+3. Apply infrastructure
+terraform apply -auto-approve
+⚠️ Challenges Encountered
+
+During implementation, we discovered:
+
+No EC2 instances were visible in the AWS environment
+Terraform data.aws_instance lookup failed
+Required adjustment to direct instance reference
+Key Debugging Insight:
+
+Always validate existing infrastructure before using Terraform data sources.
+
+📌 Outcome
+Successfully created a CloudWatch CPU alarm
+Configured automated monitoring for EC2 workload
+Learned how to define threshold-based alerting
+Strengthened Infrastructure as Code practices
+💡 Real-World Use Case
+
+In production environments, this setup is used to:
+
+Detect overloaded servers
+Trigger scaling events (Auto Scaling Groups)
+Alert DevOps engineers via email/SNS/Slack
+Prevent downtime during traffic spikes
+🧠 Key Takeaways
+CloudWatch is essential for system observability
+Terraform enables scalable monitoring automation
+CPU-based alarms are foundational for performance monitoring
+Always verify infrastructure before referencing it in IaC
+🔜 Next Steps
+
+To enhance this setup in real-world scenarios:
+
+Integrate SNS notifications (email/Slack alerts)
+Connect alarm to Auto Scaling policies
+Add multiple metrics (memory, disk, network)
+Implement remediation using AWS Lambda
