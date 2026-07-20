@@ -1,0 +1,299 @@
+
+## 📌 Lab Objective
+
+As part of an AWS data migration project, the Nautilus DevOps team required an S3 bucket to be provisioned using Terraform.
+
+The goal was to create a private S3 bucket in AWS with public access completely blocked.
+
+---
+
+# 🏗️ Scenario
+
+Organizations migrating workloads to AWS often need secure cloud storage for:
+
+- Application data
+- Backups
+- Logs
+- Migration files
+- Archives
+
+Instead of manually creating resources through the AWS Console, DevOps teams use Terraform to define infrastructure as code.
+
+This allows infrastructure to be:
+
+- Version controlled
+- Reproducible
+- Auditable
+- Automated
+
+---
+
+# 🎯 Requirements
+
+The Terraform configuration needed to:
+
+✅ Create an S3 bucket  
+✅ Use the name:
+
+```
+devops-s3-29981
+```
+
+✅ Deploy in:
+
+```
+us-east-1
+```
+
+✅ Block all public access
+
+✅ Use only:
+
+```
+main.tf
+```
+
+---
+
+# 🛠️ Environment
+
+Cloud Provider:
+
+```
+AWS
+```
+
+Infrastructure Tool:
+
+```
+Terraform
+```
+
+Terraform Working Directory:
+
+```
+/home/bob/terraform
+```
+
+Terraform File:
+
+```
+main.tf
+```
+
+---
+
+# 🏗️ Terraform Architecture
+
+```
+                Developer
+
+                    |
+                    |
+             Terraform Code
+
+                    |
+                    |
+
+              AWS Provider
+
+                    |
+                    |
+
+             AWS us-east-1
+
+                    |
+                    |
+
+              S3 Bucket
+
+          devops-s3-29981
+
+                    |
+                    |
+
+        Public Access Block Enabled
+
+        ACLs              ❌
+        Policies          ❌
+        Public Access     ❌
+```
+
+---
+
+# 📝 Terraform Configuration
+
+## Provider Configuration
+
+Configured AWS provider with the required region:
+
+```hcl
+provider "aws" {
+  region = "us-east-1"
+}
+```
+
+---
+
+## Create S3 Bucket
+
+Created the S3 bucket resource:
+
+```hcl
+resource "aws_s3_bucket" "devops_bucket" {
+  bucket = "devops-s3-29981"
+}
+```
+
+---
+
+## Enable S3 Public Access Block
+
+Configured AWS security controls to prevent public exposure:
+
+```hcl
+resource "aws_s3_bucket_public_access_block" "devops_bucket_public_access_block" {
+
+  bucket = aws_s3_bucket.devops_bucket.id
+
+  block_public_acls       = true
+  ignore_public_acls      = true
+  block_public_policy     = true
+  restrict_public_buckets = true
+
+}
+```
+
+---
+
+# 🚀 Terraform Deployment Workflow
+
+## 1. Initialize Terraform
+
+```bash
+terraform init
+```
+
+Downloads required providers.
+
+---
+
+## 2. Format Configuration
+
+```bash
+terraform fmt
+```
+
+Ensures Terraform follows standard formatting.
+
+---
+
+## 3. Validate Configuration
+
+```bash
+terraform validate
+```
+
+Checks Terraform syntax.
+
+---
+
+## 4. Preview Infrastructure Changes
+
+```bash
+terraform plan
+```
+
+Terraform displayed:
+
+```
+Plan: 2 to add, 0 to change, 0 to destroy
+```
+
+Resources:
+
+1. S3 Bucket
+2. Public Access Block
+
+---
+
+## 5. Provision Infrastructure
+
+```bash
+terraform apply
+```
+
+Terraform successfully created the AWS resources.
+
+---
+
+# 🔐 Security Concepts Learned
+
+## Why Block Public Access?
+
+An S3 bucket can accidentally become exposed through:
+
+- Public ACL permissions
+- Bucket policies
+- Misconfigured permissions
+
+AWS Public Access Block provides an additional security layer.
+
+---
+
+# 🧠 Key Learnings
+
+- Terraform allows infrastructure to be managed through code.
+- AWS resources can be recreated consistently across environments.
+- S3 security requires more than simply creating a bucket.
+- Public Access Block prevents accidental data exposure.
+- Terraform resources can depend on each other automatically.
+
+---
+
+# 🌍 Real-World DevOps Application
+
+A production engineering team migrating data to AWS might manage storage like:
+
+```
+Terraform Repository
+
+        |
+        |
+
+S3 Module
+
+        |
+        |
+
+Production Bucket
+
+        |
+        |
+ ---------------------
+ | Encryption         |
+ | Versioning         |
+ | Logging            |
+ | Lifecycle Rules    |
+ | Access Control     |
+ ---------------------
+```
+
+Infrastructure changes are reviewed through Git pull requests before deployment.
+
+---
+
+# ✅ Result
+
+Successfully provisioned a private AWS S3 bucket using Terraform with complete public access blocking enabled.
+
+---
+
+## 🚀 Skills Practiced
+
+- Terraform
+- AWS S3
+- Infrastructure as Code
+- AWS Security
+- Cloud Resource Provisioning
+- DevOps Automation
