@@ -1,0 +1,313 @@
+## 📌 Project Overview
+
+Infrastructure security starts with **Identity and Access Management (IAM)**. Before provisioning compute, storage, or networking resources in AWS, 
+organizations establish access controls to ensure users and services have only the permissions they need.
+
+In today's Terraform lab, I created an **AWS IAM policy** using Terraform that grants **read-only access to Amazon EC2 resources**, 
+following the **Principle of Least Privilege (PoLP)**.
+
+This project demonstrates how Infrastructure as Code (IaC) can be used to automate cloud security configurations in a consistent, repeatable, 
+and version-controlled manner.
+
+---
+
+## 🏗️ Lab Scenario
+
+The Nautilus DevOps team is configuring AWS IAM resources as part of their cloud infrastructure deployment.
+
+### Objective
+
+Create an IAM policy named:
+
+```text
+iampolicy_kareem
+```
+
+The policy should:
+
+- Allow users to view EC2 instances
+- Allow users to view Amazon Machine Images (AMIs)
+- Allow users to view EBS snapshots
+- Prevent users from modifying or deleting EC2 resources
+
+Terraform working directory:
+
+```text
+/home/bob/terraform
+```
+
+Configuration file:
+
+```text
+main.tf
+```
+
+AWS Region:
+
+```text
+us-east-1
+```
+
+---
+
+# 🏛️ Architecture
+
+```
+                    AWS Cloud (us-east-1)
+
+                     Terraform (IaC)
+                            │
+                            │ terraform apply
+                            ▼
+                  AWS IAM Policy Created
+                            │
+                            ▼
+                iampolicy_kareem Policy
+                            │
+          ┌─────────────────┼─────────────────┐
+          │                 │                 │
+          ▼                 ▼                 ▼
+ View EC2 Instances     View AMIs      View Snapshots
+          │                 │                 │
+          └─────────────────┼─────────────────┘
+                            │
+                     Read-Only Access
+                            │
+                  No Create / Delete / Modify
+```
+
+---
+
+## ⚙️ Technologies Used
+
+- Terraform
+- AWS IAM
+- Amazon EC2
+- Infrastructure as Code (IaC)
+- AWS Provider
+- Linux
+- Bash
+
+---
+
+# 📄 Terraform Configuration
+
+The IAM policy was created using the `aws_iam_policy` resource.
+
+```hcl
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = "us-east-1"
+}
+
+resource "aws_iam_policy" "iampolicy_kareem" {
+  name        = "iampolicy_kareem"
+  description = "Read-only access to Amazon EC2 console"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Effect = "Allow"
+
+        Action = [
+          "ec2:Describe*"
+        ]
+
+        Resource = "*"
+      }
+    ]
+  })
+}
+```
+
+---
+
+# 🚀 Deployment Steps
+
+### Navigate to the Terraform directory
+
+```bash
+cd /home/bob/terraform
+```
+
+### Initialize Terraform
+
+```bash
+terraform init
+```
+
+### Validate the configuration
+
+```bash
+terraform validate
+```
+
+### Preview the infrastructure changes
+
+```bash
+terraform plan
+```
+
+### Deploy the IAM policy
+
+```bash
+terraform apply
+```
+
+Confirm deployment:
+
+```text
+yes
+```
+
+---
+
+# 🔍 Verification
+
+Verify the policy exists:
+
+```bash
+aws iam list-policies --scope Local
+```
+
+Or view it in the AWS Console:
+
+```
+AWS Console
+    ↓
+IAM
+    ↓
+Policies
+    ↓
+iampolicy_kareem
+```
+
+---
+
+# 🔑 IAM Policy Explained
+
+The policy grants permission for:
+
+```text
+ec2:Describe*
+```
+
+This allows users to:
+
+- Describe EC2 Instances
+- Describe Volumes
+- Describe Snapshots
+- Describe Images (AMIs)
+- Describe Availability Zones
+- Describe VPCs
+- Describe Security Groups
+- Describe Network Interfaces
+
+The policy **does not allow**:
+
+- Launch EC2 instances
+- Stop instances
+- Start instances
+- Reboot instances
+- Terminate instances
+- Create snapshots
+- Delete snapshots
+- Modify security groups
+
+This makes it an ideal **read-only policy**.
+
+---
+
+# 🌍 Real-World DevOps Scenario
+
+Imagine a large enterprise with multiple engineering teams:
+
+- Cloud Engineers
+- Developers
+- QA Engineers
+- Support Engineers
+- Security Auditors
+
+The support team often needs to investigate production issues by viewing EC2 instances, attached storage, and machine images.
+
+However, granting full administrative permissions would introduce unnecessary risk.
+
+Instead, DevOps engineers create dedicated IAM policies that provide only the permissions required for each role.
+
+Using Terraform ensures these policies are:
+
+- Version controlled
+- Repeatable
+- Consistent
+- Auditable
+- Easy to update
+
+This is a fundamental practice in modern cloud security and Infrastructure as Code.
+
+---
+
+# 💡 Key Concepts Learned
+
+- Infrastructure as Code (IaC)
+- AWS IAM Policy creation
+- Terraform AWS Provider
+- JSON policy generation with `jsonencode()`
+- EC2 Describe API permissions
+- Principle of Least Privilege (PoLP)
+- Cloud security automation
+- Version-controlled infrastructure
+
+---
+
+# 🎯 Outcome
+
+Successfully created:
+
+- AWS IAM Policy
+- Policy Name:
+
+```text
+iampolicy_kareem
+```
+
+Configured using Terraform to provide **read-only access to Amazon EC2 resources** while preventing unauthorized modifications.
+
+---
+
+# 🚀 Lessons Learned
+
+- Security should be implemented before infrastructure deployment.
+- IAM policies are the foundation of secure AWS environments.
+- Least Privilege reduces operational risk.
+- Terraform simplifies the management of cloud security resources.
+- Infrastructure as Code improves consistency, collaboration, and auditability.
+
+---
+
+# 📚 Terraform Commands Used
+
+```bash
+terraform init
+
+terraform validate
+
+terraform plan
+
+terraform apply
+```
+
+---
+
+# 🏷️ Tags
+
+`Terraform` `AWS` `IAM` `EC2` `Infrastructure as Code` `Cloud Security` `DevOps` `AWS Cloud` `HashiCorp Terraform` `100DaysOfDevOps` `Cloud Engineering` `Automation`
