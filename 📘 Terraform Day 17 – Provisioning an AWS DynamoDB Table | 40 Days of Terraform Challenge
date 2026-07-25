@@ -1,0 +1,211 @@
+📌 Project Overview
+
+Infrastructure as Code (IaC) extends beyond compute, networking, and storage—it also includes databases. In today's lab, I provisioned an **Amazon DynamoDB** table using **Terraform**, demonstrating how NoSQL databases can be created and managed through code.
+
+The objective was to create a DynamoDB table named **datacenter-users** using **PAY_PER_REQUEST** billing mode and configure **datacenter_id** as the primary partition key.
+
+This exercise reinforces the importance of automating cloud database infrastructure to ensure repeatability, scalability, and consistency across environments.
+
+---
+
+# 🎯 Objectives
+
+- Provision an Amazon DynamoDB table using Terraform
+- Configure the table with a String partition key
+- Use On-Demand (PAY_PER_REQUEST) billing mode
+- Practice Infrastructure as Code for managed database services
+
+---
+
+# 🏗️ Architecture
+
+```
+                Terraform
+                    │
+             terraform apply
+                    │
+                    ▼
+          AWS Provider (us-east-1)
+                    │
+                    ▼
+      Amazon DynamoDB Table
+      -------------------------
+      Table Name:
+      datacenter-users
+
+      Partition Key:
+      datacenter_id (String)
+
+      Billing Mode:
+      PAY_PER_REQUEST
+```
+
+---
+
+# 📁 Terraform Configuration
+
+```hcl
+provider "aws" {
+  region = "us-east-1"
+}
+
+resource "aws_dynamodb_table" "datacenter_users" {
+  name         = "datacenter-users"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "datacenter_id"
+
+  attribute {
+    name = "datacenter_id"
+    type = "S"
+  }
+}
+```
+
+---
+
+# 🚀 Deployment Steps
+
+Initialize Terraform
+
+```bash
+terraform init
+```
+
+Validate configuration
+
+```bash
+terraform validate
+```
+
+Review execution plan
+
+```bash
+terraform plan
+```
+
+Provision infrastructure
+
+```bash
+terraform apply
+```
+
+---
+
+# 🔍 Resource Configuration
+
+| Property | Value |
+|-----------|-------|
+| Cloud Provider | AWS |
+| Service | DynamoDB |
+| Table Name | datacenter-users |
+| Primary Key | datacenter_id |
+| Key Type | String |
+| Billing Mode | PAY_PER_REQUEST |
+| Region | us-east-1 |
+
+---
+
+# 💡 Key Concepts Learned
+
+### Amazon DynamoDB
+
+DynamoDB is AWS's fully managed NoSQL database service designed for:
+
+- High availability
+- Low latency
+- Automatic scaling
+- Serverless applications
+- Event-driven architectures
+
+---
+
+### Partition Key (Hash Key)
+
+The partition key uniquely identifies every item stored in the table.
+
+```
+datacenter_id
+```
+
+Example:
+
+| datacenter_id | Name |
+|---------------|------|
+| DC001 | Oscar |
+| DC002 | Sarah |
+| DC003 | David |
+
+---
+
+### PAY_PER_REQUEST
+
+Instead of provisioning read/write capacity beforehand:
+
+- AWS automatically scales capacity
+- Pay only for actual requests
+- No capacity planning required
+
+Perfect for:
+
+- APIs
+- Startups
+- Serverless applications
+- Variable workloads
+
+---
+
+# 🌍 Real-World Use Cases
+
+Organizations commonly use DynamoDB for:
+
+- User profile management
+- Session storage
+- Shopping carts
+- IoT device data
+- Mobile applications
+- Gaming leaderboards
+- Metadata storage
+- Microservices architectures
+
+---
+
+# 🧠 Lessons Learned
+
+Today's project demonstrated that Terraform can provision fully managed database services just as easily as virtual machines or storage.
+
+Using Infrastructure as Code ensures:
+
+- Repeatable deployments
+- Version-controlled infrastructure
+- Faster environment provisioning
+- Reduced manual configuration errors
+
+---
+
+# ✅ Lab Outcome
+
+Successfully provisioned:
+
+- Amazon DynamoDB Table
+- On-Demand Billing
+- String Partition Key
+- Infrastructure managed entirely with Terraform
+
+---
+
+## 🚀 Skills Gained
+
+- Terraform
+- AWS DynamoDB
+- Infrastructure as Code (IaC)
+- NoSQL Databases
+- Cloud Automation
+- AWS Provider Configuration
+
+---
+
+## 📅 Challenge
+
+**Terraform 40 Days Challenge – Day 16**
+
+Automating cloud infrastructure one resource at a time.
